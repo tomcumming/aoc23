@@ -1,0 +1,16 @@
+cabal-version: 3.8
+name: aoc23
+version: 0.1
+
+common shared
+  ghc-options: -Wall
+  default-language: GHC2021
+  default-extensions:
+    LambdaCase
+  build-depends:
+    base
+
+executable day1
+  import: shared
+  main-is: Day1.hs
+  hs-source-dirs: exe

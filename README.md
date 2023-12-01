@@ -1,0 +1,3 @@
+## AoC 23
+
+Very low effort Advent of Code 2023 solutions until I stop early again...
