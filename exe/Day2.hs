@@ -6,6 +6,7 @@ import Data.Foldable (find)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Map qualified as M
+import System.Environment (getArgs)
 import System.IO (getContents')
 import Text.ParserCombinators.ReadP (ReadP)
 import Text.ParserCombinators.ReadP qualified as P
@@ -42,9 +43,25 @@ limits = M.fromList [("red", 12), ("green", 13), ("blue", 14)]
 limitTo :: M.Map String Int -> M.Map String Int -> Bool
 limitTo ls xs = M.intersectionWith (>=) ls xs & and
 
+smallest :: [M.Map String Int] -> M.Map String Int
+smallest = M.unionsWith max
+
 main :: IO ()
 main =
-  getContents'
-    >>= (lines >>> traverse (readsFail readsLine))
-    >>= pure . filter (all (limitTo limits) . snd)
-    >>= (fmap fst >>> sum >>> print)
+  getArgs >>= \case
+    [] -> ls >>= part1
+    ["part2"] -> ls >>= part2
+    _ -> fail "Unexpected args"
+ where
+  ls =
+    getContents'
+      >>= (lines >>> traverse (readsFail readsLine))
+  part1 =
+    filter (all (limitTo limits) . snd)
+      >>> fmap fst
+      >>> sum
+      >>> print
+  part2 =
+    fmap (snd >>> smallest >>> product)
+      >>> sum
+      >>> print
