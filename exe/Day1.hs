@@ -1,5 +1,6 @@
 module Main (main) where
 
+import AOC.IO (readFail)
 import Control.Arrow (first, (>>>))
 import Control.Monad (msum, (>=>))
 import Data.Char (isDigit)
@@ -7,7 +8,6 @@ import Data.Functor ((<&>))
 import Data.List (isPrefixOf)
 import System.Environment (getArgs)
 import System.IO (getContents')
-import Text.Read (readEither)
 
 main :: IO ()
 main = do
@@ -22,9 +22,6 @@ main = do
   getContents'
     >>= day1 ps
     >>= print
-
-readFail :: (MonadFail m, Read a) => String -> m a
-readFail = either fail pure . readEither
 
 day1 :: (MonadFail m) => [(String, Char)] -> String -> m Integer
 day1 ps =

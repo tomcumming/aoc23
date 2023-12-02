@@ -1,1 +1,1 @@
-cabal run fourmolu -- --mode inplace $(find exe src test -name '*.hs')
+cabal run fourmolu -- --mode inplace $(find exe helpers -name '*.hs')

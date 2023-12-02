@@ -8,9 +8,23 @@ common shared
   default-extensions:
     LambdaCase
   build-depends:
-    base
+    base,
+    containers
+
+library
+  import: shared
+  hs-source-dirs: helpers
+  exposed-modules:
+    AOC.IO
 
 executable day1
   import: shared
   main-is: Day1.hs
   hs-source-dirs: exe
+  build-depends: aoc23
+
+executable day2
+  import: shared
+  main-is: Day2.hs
+  hs-source-dirs: exe
+  build-depends: aoc23
