@@ -1,13 +1,16 @@
 module Main (main) where
 
+import Control.Arrow (second)
 import Control.Category ((>>>))
 import Data.Char (isDigit)
-import Data.Either (isLeft)
+import Data.Foldable (fold)
 import Data.Function ((&))
 import Data.Map qualified as M
-import Data.Maybe (maybeToList)
-import Data.Monoid (Sum (..))
+import Data.Maybe (fromMaybe, maybeToList)
+import Data.Monoid (Product (..), Sum (..))
 import Data.Set qualified as S
+import Data.Tuple (swap)
+import System.Environment (getArgs)
 import System.IO (getContents')
 
 type Entry = Either Char Integer
@@ -50,21 +53,51 @@ neighbours :: Coord -> S.Set Coord
 neighbours (x, y) =
   S.fromList $ [(x + xd, y + yd) | xd <- [-1 .. 1], yd <- [-1 .. 1]]
 
-symbolNeighbours :: M.Map Coord Entry -> S.Set Coord
+numberNeighbours :: M.Map Coord Entry -> Coord -> S.Set Coord
+numberNeighbours es = neighbours >>> foldMap findNum
+ where
+  findNum = (`M.lookup` numberPositions es) >>> maybe mempty S.singleton
+
+symbolNeighbours :: M.Map Coord Entry -> M.Map Char (S.Set (S.Set Coord))
 symbolNeighbours es =
   es
-    & M.filter isLeft
-    & M.keysSet
-    & foldMap neighbours
-    & foldMap ((`M.lookup` numberPositions es) >>> maybe mempty S.singleton)
+    & M.mapMaybe (either Just (const Nothing))
+    & M.toList
+    & fmap (swap >>> second (numberNeighbours es >>> S.singleton))
+    & M.fromListWith (<>)
 
 day3 :: M.Map Coord Entry -> Integer
 day3 es =
   es
     & symbolNeighbours
+    & foldMap fold
     & foldMap (flip M.lookup es >>> maybeToList)
     & foldMap (either (const mempty) Sum)
     & getSum
 
+day3part2 :: M.Map Coord Entry -> Integer
+day3part2 es =
+  es
+    & symbolNeighbours
+    & M.lookup '*'
+    & fromMaybe mempty
+    & S.filter (S.size >>> (== 2))
+    & foldMap
+      ( foldMap
+          ( flip M.lookup es
+              >>> maybeToList
+              >>> foldMap (either (const mempty) Product)
+          )
+          >>> getProduct
+          >>> Sum
+      )
+    & getSum
+
 main :: IO ()
-main = getContents' >>= (parseLines >>> day3 >>> print)
+main = do
+  f <-
+    getArgs >>= \case
+      [] -> pure day3
+      ["part2"] -> pure day3part2
+      _ -> fail "Unexpected args"
+  getContents' >>= (parseLines >>> f >>> print)
