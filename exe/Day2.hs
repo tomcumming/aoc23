@@ -1,8 +1,8 @@
 module Main (main) where
 
+import AOC.IO (readsFail, readsRead)
 import Control.Arrow ((>>>))
 import Control.Monad (void)
-import Data.Foldable (find)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Map qualified as M
@@ -10,14 +10,6 @@ import System.Environment (getArgs)
 import System.IO (getContents')
 import Text.ParserCombinators.ReadP (ReadP)
 import Text.ParserCombinators.ReadP qualified as P
-
-readsFail :: (MonadFail m) => ReadP a -> String -> m a
-readsFail f s =
-  find ((== "") . snd) (P.readP_to_S f s)
-    & maybe (fail $ "Could not reads: " <> s) (pure . fst)
-
-readsRead :: (Read a) => ReadP a
-readsRead = P.readS_to_P reads
 
 readsLine :: ReadP (Int, [M.Map String Int])
 readsLine = do
