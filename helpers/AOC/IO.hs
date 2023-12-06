@@ -5,7 +5,7 @@ import Data.Function ((&))
 import Text.ParserCombinators.ReadP qualified as P
 import Text.Read (readEither)
 
-readFail :: (MonadFail m, Read a) => String -> m a
+readFail :: forall a m. (MonadFail m, Read a) => String -> m a
 readFail = either fail pure . readEither
 
 readsFail :: (MonadFail m) => P.ReadP a -> String -> m a
