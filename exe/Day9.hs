@@ -3,6 +3,7 @@ module Main (main) where
 import AOC.IO (readsFail, readsRead)
 import Control.Category ((>>>))
 import Data.Foldable (foldl')
+import System.Environment (getArgs)
 import System.IO (getContents')
 import Text.ParserCombinators.ReadP qualified as P
 
@@ -24,7 +25,12 @@ newRow :: [Int] -> [Int]
 newRow = scanr (+) 0
 
 main :: IO ()
-main =
+main = do
+  f <-
+    getArgs >>= \case
+      [] -> pure id
+      ["part2"] -> pure reverse
+      _ -> fail "Unexpected args"
   getContents'
     >>= readsFail parseInput
-    >>= (fmap (initialize >>> newRow >>> take 1) >>> concat >>> sum >>> print)
+    >>= (fmap (f >>> initialize >>> newRow >>> take 1) >>> concat >>> sum >>> print)
