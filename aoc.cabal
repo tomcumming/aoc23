@@ -9,7 +9,8 @@ common shared
     LambdaCase
   build-depends:
     base,
-    containers
+    containers,
+    mtl
 
 library
   import: shared
@@ -80,5 +81,17 @@ executable day10
 executable day11
   import: shared
   main-is: Day11.hs
+  hs-source-dirs: exe
+  build-depends: aoc23
+
+executable day12
+  import: shared
+  main-is: Day12.hs
+  hs-source-dirs: exe
+  build-depends: aoc23
+
+executable day13
+  import: shared
+  main-is: Day13.hs
   hs-source-dirs: exe
   build-depends: aoc23
