@@ -5,6 +5,7 @@ import Data.Bool (bool)
 import Data.Function ((&))
 import Data.List qualified as L
 import Data.Monoid (Sum (Sum), getSum)
+import System.Environment (getArgs)
 import System.IO (getContents')
 
 parseInput :: String -> [String]
@@ -26,6 +27,20 @@ rollColumn = fixedPoint go
     c : xs -> c : go xs
     [] -> []
 
+rotateCW :: [String] -> [String]
+rotateCW = L.transpose >>> fmap reverse
+
+rollCycle :: [String] -> [String]
+rollCycle =
+  rollNorth
+    >>> rotateCW
+    >>> rollNorth
+    >>> rotateCW
+    >>> rollNorth
+    >>> rotateCW
+    >>> rollNorth
+    >>> rotateCW
+
 calcLoad :: [String] -> Int
 calcLoad =
   L.transpose
@@ -36,11 +51,20 @@ calcLoad =
       )
     >>> getSum
 
+runBillions :: [[String]] -> [String] -> [String]
+runBillions befores ss
+  | Just idx <- L.elemIndex ss befores =
+      let cycleLen = idx + 1
+          left = 1_000_000_000 - length befores
+       in reverse (take cycleLen befores) !! (left `mod` cycleLen)
+  | otherwise = rollCycle ss & runBillions (ss : befores)
+
 main :: IO ()
-main =
+main = do
+  f <-
+    getArgs >>= \case
+      [] -> pure rollNorth
+      ["part2"] -> runBillions [] & pure
+      _ -> fail "Unexpected args"
   getContents'
-    >>= ( parseInput
-            >>> rollNorth
-            >>> calcLoad
-            >>> print
-        )
+    >>= (parseInput >>> f >>> calcLoad >>> print)
