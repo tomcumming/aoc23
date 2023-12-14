@@ -95,3 +95,9 @@ executable day13
   main-is: Day13.hs
   hs-source-dirs: exe
   build-depends: aoc23
+
+executable day14
+  import: shared
+  main-is: Day14.hs
+  hs-source-dirs: exe
+  build-depends: aoc23
