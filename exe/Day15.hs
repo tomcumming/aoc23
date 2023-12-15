@@ -22,12 +22,7 @@ hash = go 0
  where
   go n = \case
     [] -> n
-    x : xs ->
-      let n' =
-            n
-              & (+ fromIntegral (ord x))
-              & (* 17)
-       in go n' xs
+    x : xs -> go ((n + fromIntegral (ord x)) * 17) xs
 
 parseInst :: String -> IO (String, Maybe Word8)
 parseInst s
