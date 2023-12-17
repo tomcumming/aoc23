@@ -10,6 +10,7 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Map qualified as M
 import Data.Maybe (maybeToList)
+import System.Environment (getArgs)
 import System.IO (getContents')
 
 parseInput :: (MonadFail m) => String -> m [[Int]]
@@ -48,9 +49,9 @@ cost fls (x, y) (dx, dy) = traverse (fls M.!?) cs <&> sum
     (x /= x' || y /= y') & guard
     pure (x', y')
 
-neighbours :: M.Map Coord Int -> State -> [(State, Heat)]
-neighbours fls ((x, y), d) = do
-  m <- [1 .. 3]
+neighbours :: Int -> Int -> M.Map Coord Int -> State -> [(State, Heat)]
+neighbours minLen maxLen fls ((x, y), d) = do
+  m <- [minLen .. maxLen]
   d' <- turns d
   d /= d' & guard
   let (dx, dy) = unitDir d' & bimap (* m) (* m)
@@ -58,19 +59,24 @@ neighbours fls ((x, y), d) = do
   h <- cost fls (x, y) c' & maybeToList
   pure ((c', d'), h)
 
-part1 :: (MonadFail m) => M.Map Coord Int -> m (Heat, [State])
-part1 fls = do
+searcher :: (MonadFail m) => Int -> Int -> M.Map Coord Int -> m (Heat, [State])
+searcher minLen maxLen fls = do
   let maxX = M.keys fls & fmap fst & maximum
   let maxY = M.keys fls & fmap snd & maximum
   dijkstraAssoc
-    (neighbours fls)
+    (neighbours minLen maxLen fls)
     (\(c, _) -> c == (maxX, maxY))
     ((0, 0), Up)
     & maybe (fail "No solution found") pure
 
 main :: IO ()
-main =
+main = do
+  f <-
+    getArgs >>= \case
+      [] -> searcher 1 3 & pure
+      ["part2"] -> searcher 4 10 & pure
+      _ -> fail "Unexpected args"
   getContents'
     >>= parseInput
-    >>= (intoCoords >>> part1)
+    >>= (intoCoords >>> f)
     >>= (fst >>> print)
