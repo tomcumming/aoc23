@@ -1,3 +1,3 @@
 ## AoC 23
 
-Very low effort Advent of Code 2023 solutions until I stop early again...
+25 days of very low effort Advent of Code 2023 solutions (10/25 just part 1), lots of brute force, in left-to-right style
