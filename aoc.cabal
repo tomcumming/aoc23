@@ -162,3 +162,9 @@ executable day24
   main-is: Day24.hs
   hs-source-dirs: exe
   build-depends: aoc23
+
+executable day25
+  import: shared
+  main-is: Day25.hs
+  hs-source-dirs: exe
+  build-depends: aoc23, search-algorithms, random
